@@ -19,7 +19,7 @@ endif #PDK
 # but generated source files in its LOCAL_INTERMEDIATE_SOURCE_DIR.
 # You have to set up the dependency in some other way.
 ifeq (,$(strip $(LOCAL_SRC_FILES)$(all_res_assets)$(LOCAL_STATIC_JAVA_LIBRARIES))$(filter true,$(LOCAL_SOURCE_FILES_ALL_GENERATED)))
-$(warning $(LOCAL_PATH): Target java module does not define any source or resource files)
+$(error $(LOCAL_PATH): Target java module does not define any source or resource files)
 endif
 
 LOCAL_NO_STANDARD_LIBRARIES:=$(strip $(LOCAL_NO_STANDARD_LIBRARIES))
@@ -235,7 +235,7 @@ $(cleantarget): PRIVATE_CLEAN_FILES += $(intermediates.COMMON)
 # If the module includes java code (i.e., it's not framework-res), compile it.
 full_classes_jar :=
 built_dex :=
-ifneq (,$(strip $(all_java_sources)$(full_static_java_libs))$(filter true,$(LOCAL_SOURCE_FILES_ALL_GENERATED)))
+ifneq (,$(strip $(all_java_sources)$(full_static_java_libs)))
 
 # If LOCAL_BUILT_MODULE_STEM wasn't overridden by our caller,
 # full_classes_jar will be the same module as LOCAL_BUILT_MODULE.
