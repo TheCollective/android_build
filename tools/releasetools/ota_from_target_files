@@ -390,6 +390,16 @@ def WriteFullOTAPackage(input_zip, output_zip):
   device_specific.FullOTA_InstallBegin()
 
   script.ShowProgress(0.5, 0)
+  script.Print("")
+  script.Print("")
+  script.Print("The Collective AoCP-CP-4.4")
+  script.Print("")
+  script.Print(" twitter@CollectiveDevs  ")
+  script.Print("")
+  script.Print(" CollectiveAndroidDevs@gmail.com ")
+  script.Print("")
+  script.Print("")
+  script.Print("Installing system files...")
 
   if OPTIONS.wipe_user_data:
     script.FormatPartition("/data")
