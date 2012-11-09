@@ -485,7 +485,7 @@ $(cleantarget) : PRIVATE_CLEAN_FILES := \
 		$(LOCAL_INSTALLED_MODULE) \
 		$(intermediates)
 $(cleantarget)::
-	@echo -e ${CL_GRN}"Clean:"${CL_RST}" $(PRIVATE_MODULE)"
+	@echo "Clean: $(PRIVATE_MODULE)"
 	$(hide) rm -rf $(PRIVATE_CLEAN_FILES)
 
 ###########################################################
@@ -530,7 +530,7 @@ ifndef LOCAL_UNINSTALLABLE_MODULE
   # installation;  hence, LOCAL_ACP_UNAVAILABLE.
 ifneq ($(LOCAL_ACP_UNAVAILABLE),true)
 $(LOCAL_INSTALLED_MODULE): $(LOCAL_BUILT_MODULE) | $(ACP)
-	@echo -e ${CL_CYN}"Install: $@"${CL_RST}
+	@echo -e ${CL_CYN}"Install: $(ANDROID_BUILD_TOP)/$@"${CL_RST}
 	$(copy-file-to-new-target)
 else
 $(LOCAL_INSTALLED_MODULE): $(LOCAL_BUILT_MODULE)
