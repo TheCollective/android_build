@@ -55,6 +55,20 @@ function check_product()
         echo "Couldn't locate the top of the tree.  Try setting TOP." >&2
         return
     fi
+
+    if (echo -n $1 | grep -q -e "^aocp_") ; then
+       AOCP_BUILD=$(echo -n $1 | sed -e 's/^aocp_//g')
+       NAM_VARIANT=$(echo -n $1 | sed -e 's/^aocp_//g')
+    elif (echo -n $1 | grep -q -e "htc_") ; then
+       AOCP_BUILD=
+       NAM_VARIANT=$(echo -n $1)
+    else 
+       AOCP_BUILD=
+       NAM_VARIANT=
+    fi
+    export AOCP_BUILD
+    export NAM_VARIANT
+
     CALLED_FROM_SETUP=true BUILD_SYSTEM=build/core \
         TARGET_PRODUCT=$1 \
         TARGET_BUILD_VARIANT= \
@@ -430,8 +444,15 @@ function print_lunch_menu()
     local uname=$(uname)
     echo
     echo "You're building on" $uname
+    if [ "$(uname)" = "Darwin" ] ; then
+       echo "  (ohai, koush!)"
+    fi
     echo
-    echo "Lunch menu... pick a combo:"
+    if [ "z${AOCP_DEVICES_ONLY}" != "z" ]; then
+       echo "Breakfast menu... pick a combo:"
+    else
+       echo "Lunch menu... pick a combo:"
+    fi
 
     local i=1
     local choice
@@ -441,8 +462,56 @@ function print_lunch_menu()
         i=$(($i+1))
     done
 
+    if [ "z${AOCP_DEVICES_ONLY}" != "z" ]; then
+       echo "... and don't forget the bacon!"
+    fi
+
     echo
 }
+
+function brunch()
+{
+    breakfast $*
+    if [ $? -eq 0 ]; then
+        export CM_FAST_BUILD=1
+        mka bacon
+    else
+        echo "No such item in brunch menu. Try 'breakfast'"
+        return 1
+    fi
+    return $?
+}
+
+function breakfast()
+{
+    target=$1
+    AOCP_DEVICES_ONLY="true"
+    unset LUNCH_MENU_CHOICES
+    add_lunch_combo full-eng
+    for f in `/bin/ls vendor/aocp/vendorsetup.sh 2> /dev/null`
+        do
+            echo "including $f"
+            . $f
+        done
+    unset f
+
+    if [ $# -eq 0 ]; then
+        # No arguments, so let's have the full menu
+        lunch
+    else
+        echo "z$target" | grep -q "-"
+        if [ $? -eq 0 ]; then
+            # A buildtype was specified, assume a full device name
+            lunch $target
+        else
+            # This is probably just the AoCP model name
+            lunch aocp_$target-userdebug
+        fi
+    fi
+    return $?
+}
+
+alias bib=breakfast
 
 function lunch()
 {
@@ -566,6 +635,49 @@ function tapas()
 
     set_stuff_for_environment
     printconfig
+}
+
+function eat()
+{
+    if [ "$OUT" ] ; then
+        MODVERSION=`sed -n -e'/ro\.aocp\.version/s/.*=//p' $OUT/system/build.prop`
+        ZIPFILE=aocp-$MODVERSION.zip
+        ZIPPATH=$OUT/$ZIPFILE
+        if [ ! -f $ZIPPATH ] ; then
+            echo "Nothing to eat"
+            return 1
+        fi
+        adb start-server # Prevent unexpected starting server message from adb get-state in the next line
+        if [ $(adb get-state) != device -a $(adb shell busybox test -e /sbin/recovery 2> /dev/null; echo $?) != 0 ] ; then
+            echo "No device is online. Waiting for one..."
+            echo "Please connect USB and/or enable USB debugging"
+            until [ $(adb get-state) = device -o $(adb shell busybox test -e /sbin/recovery 2> /dev/null; echo $?) = 0 ];do
+                sleep 1
+            done
+            echo "Device Found.."
+        fi
+        # if adbd isn't root we can't write to /cache/recovery/
+        adb root
+        sleep 1
+        adb wait-for-device
+        echo "Pushing $ZIPFILE to device"
+        if adb push $ZIPPATH /storage/sdcard0/ ; then
+            # Optional path for sdcard0 in recovery
+            [ -z "$1" ] && DIR=sdcard || DIR=$1
+            cat << EOF > /tmp/command
+--update_package=/$DIR/$ZIPFILE
+EOF
+            if adb push /tmp/command /cache/recovery/ ; then
+                echo "Rebooting into recovery for installation"
+                adb reboot recovery
+            fi
+            rm /tmp/command
+        fi
+    else
+        echo "Nothing to eat"
+        return 1
+    fi
+    return $?
 }
 
 function gettop
