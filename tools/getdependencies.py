@@ -107,7 +107,7 @@ def add_to_manifest(repositories):
 
         print 'Adding dependency: TheCollective/%s -> %s' % (repo_name, repo_target)
         project = ElementTree.Element("project", attrib = { "path": repo_target,
-            "remote": "github", "name": "TheCollective/%s" % repo_name, "revision": "android-4.2_r1" })
+            "remote": "github", "name": "TheCollective/%s" % repo_name, "revision": "jellybean" })
 
         if 'branch' in repository:
             project.set('revision',repository['branch'])
