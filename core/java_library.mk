@@ -61,7 +61,11 @@ include $(BUILD_SYSTEM)/java.mk
 ifeq ($(LOCAL_IS_STATIC_JAVA_LIBRARY),true)
 # No dex; all we want are the .class files with resources.
 $(common_javalib.jar) : $(full_classes_jar) $(java_resource_sources)
+<<<<<<< HEAD
 	@echo "target Static Jar: $(PRIVATE_MODULE) ($@)"
+=======
+	@echo -e ${CL_GRN}"target Static Jar:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+>>>>>>> 6c2a597171e3426a2b7a776db68442c97c2f26c3
 	$(copy-file-to-target)
 ifneq ($(extra_jar_args),)
 	$(add-java-resources-to-package)
@@ -74,7 +78,11 @@ else # !LOCAL_IS_STATIC_JAVA_LIBRARY
 
 $(common_javalib.jar): PRIVATE_DEX_FILE := $(built_dex)
 $(common_javalib.jar) : $(built_dex) $(java_resource_sources) | $(AAPT)
+<<<<<<< HEAD
 	@echo "target Jar: $(PRIVATE_MODULE) ($@)"
+=======
+	@echo -e ${CL_GRN}"target Jar:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+>>>>>>> 6c2a597171e3426a2b7a776db68442c97c2f26c3
 	$(create-empty-package)
 	$(add-dex-to-package)
 	$(add-carried-java-resources)
@@ -101,7 +109,11 @@ $(built_odex): PRIVATE_MODULE := $(LOCAL_MODULE)
 # Make sure the boot jars get dex-preopt-ed first
 $(built_odex) : $(DEXPREOPT_BOOT_ODEXS)
 $(built_odex) : $(common_javalib.jar) | $(DEXPREOPT) $(DEXOPT)
+<<<<<<< HEAD
 	@echo "Dexpreopt Jar: $(PRIVATE_MODULE) ($@)"
+=======
+	@echo -e ${CL_GRN}"Dexpreopt Jar:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+>>>>>>> 6c2a597171e3426a2b7a776db68442c97c2f26c3
 	$(hide) rm -f $@
 	@mkdir -p $(dir $@)
 	$(call dexpreopt-one-file,$<,$@)
