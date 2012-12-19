@@ -98,10 +98,6 @@ ifeq ($(FORCE_ARM_DEBUGGING),true)
   TARGET_thumb_CFLAGS += -marm -fno-omit-frame-pointer
 endif
 
-<<<<<<< HEAD
-TARGET_GLOBAL_CFLAGS += \
-			-msoft-float -fpic -fPIE \
-=======
 ifeq ($(TARGET_DISABLE_ARM_PIE),true)
    PIE_GLOBAL_CFLAGS :=
    PIE_EXECUTABLE_TRANSFORM := -Wl,-T,$(BUILD_SYSTEM)/armelf.x
@@ -112,7 +108,6 @@ endif
 
 TARGET_GLOBAL_CFLAGS += \
 			-msoft-float -fpic $(PIE_GLOBAL_CFLAGS) \
->>>>>>> 6c2a597171e3426a2b7a776db68442c97c2f26c3
 			-ffunction-sections \
 			-fdata-sections \
 			-funwind-tables \
@@ -284,11 +279,7 @@ $(hide) $(PRIVATE_CXX) \
 endef
 
 define transform-o-to-executable-inner
-<<<<<<< HEAD
-$(hide) $(PRIVATE_CXX) -nostdlib -Bdynamic -fPIE -pie \
-=======
 $(hide) $(PRIVATE_CXX) -nostdlib -Bdynamic $(PIE_EXECUTABLE_TRANSFORM) \
->>>>>>> 6c2a597171e3426a2b7a776db68442c97c2f26c3
 	-Wl,-dynamic-linker,/system/bin/linker \
 	-Wl,--gc-sections \
 	-Wl,-z,nocopyreloc \
