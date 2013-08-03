@@ -158,7 +158,7 @@ def fetch_dependencies(repo_path):
 
         if len(fetch_list) > 0:
             print 'Adding dependencies to manifest'
-            add_to_manifest_dependencies(fetch_list)
+            add_to_manifest(fetch_list)
     else:
         print 'Dependencies file not found, bailing out.'
 
@@ -184,7 +184,7 @@ else:
 
             repo_path = "device/%s/%s" % (manufacturer, device)
 
-            add_to_manifest([{'repository':repo_name,'target_path':repo_path,'branch':'jb4.3'}])
+            add_to_manifest([{'repository':repo_name,'target_path':repo_path,'branch':'jellybean3'}])
 
             print "Syncing repository to retrieve project."
             os.system('repo sync %s' % repo_path)
@@ -194,4 +194,4 @@ else:
             print "Done"
             sys.exit()
 
-print "Repository for %s not found in the SlimRoms Github repository list. If this is in error, you may need to manually add it to .repo/local_manifests/slim_manifest.xml" % device
+print "Repository for %s not found in the SlimRoms Github repository list. If this is in error, you may need to manually add it to .repo/local_manifests/aocp_manifest.xml" % device
