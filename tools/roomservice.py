@@ -33,13 +33,13 @@ except:
     device = product
 
 if not depsonly:
-    print "Device %s not found. Attempting to retrieve device repository from SlimRoms Github (http://github.com/SlimRoms)." % device
+    print "Device %s not found. Attempting to retrieve device repository from TheCollective Github (http://github.com/TheCollective)." % device
 
 repositories = []
 
 page = 1
 while not depsonly:
-    result = json.loads(urllib2.urlopen("https://api.github.com/users/SlimRoms/repos?page=%d" % page).read())
+    result = json.loads(urllib2.urlopen("https://api.github.com/users/TheCollective/repos?page=%d" % page).read())
     if len(result) == 0:
         break
     for res in result:
