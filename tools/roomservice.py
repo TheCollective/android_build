@@ -18,7 +18,6 @@ import sys
 import urllib2
 import json
 import re
-import netrc, base64
 from xml.etree import ElementTree
 
 product = sys.argv[1];
@@ -34,31 +33,21 @@ except:
     device = product
 
 if not depsonly:
-    print "Device %s not found. Attempting to retrieve device repository from TheCollective Github (http://github.com/TheCollective)." % device
+    print "Device %s not found. Attempting to retrieve device repository from SlimRoms Github (http://github.com/SlimRoms)." % device
 
 repositories = []
 
-try:
-    authtuple = netrc.netrc().authenticators("api.github.com")
-
-    if authtuple:
-        githubauth = base64.encodestring('%s:%s' % (authtuple[0], authtuple[2])).replace('\n', '')
-    else:
-        githubauth = None
-except:
-    githubauth = None
-
 page = 1
 while not depsonly:
-    githubreq = urllib2.Request("https://api.github.com/users/TheCollective/repos?per_page=100&page=%d" % page)
-    if githubauth:
-        githubreq.add_header("Authorization","Basic %s" % githubauth)
-    result = json.loads(urllib2.urlopen(githubreq).read())
+    result = json.loads(urllib2.urlopen("https://api.github.com/users/SlimRoms/repos?page=%d" % page).read())
     if len(result) == 0:
         break
     for res in result:
         repositories.append(res)
     page = page + 1
+
+local_manifests = r'.repo/local_manifests'
+if not os.path.exists(local_manifests): os.makedirs(local_manifests)
 
 def exists_in_tree(lm, repository):
     for child in lm.getchildren():
@@ -84,7 +73,7 @@ def indent(elem, level=0):
 
 def get_from_manifest(devicename):
     try:
-        lm = ElementTree.parse(".repo/local_manifest.xml")
+        lm = ElementTree.parse(".repo/local_manifests/aocp_manifest.xml")
         lm = lm.getroot()
     except:
         lm = ElementTree.Element("manifest")
@@ -106,22 +95,22 @@ def get_from_manifest(devicename):
 
     return None
 
-def is_in_manifest(projectname):
+def is_in_manifest(projectname, branch):
     try:
-        lm = ElementTree.parse(".repo/local_manifest.xml")
+        lm = ElementTree.parse(".repo/local_manifests/aocp_manifest.xml")
         lm = lm.getroot()
     except:
         lm = ElementTree.Element("manifest")
 
     for localpath in lm.findall("project"):
-        if localpath.get("name") == projectname:
+        if localpath.get("name") == projectname and localpath.get("revision") == branch:
             return 1
 
     return None
 
 def add_to_manifest(repositories):
     try:
-        lm = ElementTree.parse(".repo/local_manifest.xml")
+        lm = ElementTree.parse(".repo/local_manifests/aocp_manifest.xml")
         lm = lm.getroot()
     except:
         lm = ElementTree.Element("manifest")
@@ -135,10 +124,10 @@ def add_to_manifest(repositories):
 
         print 'Adding dependency: TheCollective/%s -> %s' % (repo_name, repo_target)
         project = ElementTree.Element("project", attrib = { "path": repo_target,
-            "revision": "jellybean2", "remote": "github", "name": "TheCollective/%s" % repo_name })
+            "revision": "jellybean3", "remote": "github", "name": "TheCollective/%s" % repo_name })
 
         if 'branch' in repository:
-            project.set('revision',repository['branch'])
+            project.set('revision', repository['branch'])
 
         lm.append(project)
 
@@ -146,7 +135,7 @@ def add_to_manifest(repositories):
     raw_xml = ElementTree.tostring(lm)
     raw_xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + raw_xml
 
-    f = open('.repo/local_manifest.xml', 'w')
+    f = open('.repo/local_manifests/aocp_manifest.xml', 'w')
     f.write(raw_xml)
     f.close()
 
@@ -169,7 +158,7 @@ def fetch_dependencies(repo_path):
 
         if len(fetch_list) > 0:
             print 'Adding dependencies to manifest'
-            add_to_manifest(fetch_list)
+            add_to_manifest_dependencies(fetch_list)
     else:
         print 'Dependencies file not found, bailing out.'
 
@@ -195,7 +184,7 @@ else:
 
             repo_path = "device/%s/%s" % (manufacturer, device)
 
-            add_to_manifest([{'repository':repo_name,'target_path':repo_path}])
+            add_to_manifest([{'repository':repo_name,'target_path':repo_path,'branch':'jb4.3'}])
 
             print "Syncing repository to retrieve project."
             os.system('repo sync %s' % repo_path)
@@ -205,4 +194,4 @@ else:
             print "Done"
             sys.exit()
 
-print "Repository for %s not found in the TheCollective Github repository list. If this is in error, you may need to manually add it to your local_manifest.xml." % device
+print "Repository for %s not found in the SlimRoms Github repository list. If this is in error, you may need to manually add it to .repo/local_manifests/slim_manifest.xml" % device
