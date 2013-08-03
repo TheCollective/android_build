@@ -18,6 +18,7 @@ import sys
 import urllib2
 import json
 import re
+import netrc, base64
 from xml.etree import ElementTree
 
 product = sys.argv[1];
@@ -37,9 +38,22 @@ if not depsonly:
 
 repositories = []
 
+try:
+    authtuple = netrc.netrc().authenticators("api.github.com")
+
+    if authtuple:
+        githubauth = base64.encodestring('%s:%s' % (authtuple[0], authtuple[2])).replace('\n', '')
+    else:
+        githubauth = None
+except:
+    githubauth = None
+
 page = 1
 while not depsonly:
-    result = json.loads(urllib2.urlopen("https://api.github.com/users/TheCollective/repos?page=%d" % page).read())
+    githubreq = urllib2.Request("https://api.github.com/users/TheCollective/repos?per_page=100&page=%d" % page)
+    if githubauth:
+        githubreq.add_header("Authorization","Basic %s" % githubauth)
+    result = json.loads(urllib2.urlopen(githubreq).read())
     if len(result) == 0:
         break
     for res in result:
@@ -95,7 +109,7 @@ def get_from_manifest(devicename):
 
     return None
 
-def is_in_manifest(projectname, branch):
+def is_in_manifest(projectname):
     try:
         lm = ElementTree.parse(".repo/local_manifests/aocp_manifest.xml")
         lm = lm.getroot()
@@ -103,7 +117,7 @@ def is_in_manifest(projectname, branch):
         lm = ElementTree.Element("manifest")
 
     for localpath in lm.findall("project"):
-        if localpath.get("name") == projectname and localpath.get("revision") == branch:
+        if localpath.get("name") == projectname:
             return 1
 
     return None
@@ -127,7 +141,7 @@ def add_to_manifest(repositories):
             "revision": "jellybean3", "remote": "github", "name": "TheCollective/%s" % repo_name })
 
         if 'branch' in repository:
-            project.set('revision', repository['branch'])
+            project.set('revision',repository['branch'])
 
         lm.append(project)
 
@@ -184,7 +198,7 @@ else:
 
             repo_path = "device/%s/%s" % (manufacturer, device)
 
-            add_to_manifest([{'repository':repo_name,'target_path':repo_path,'branch':'jellybean3'}])
+            add_to_manifest([{'repository':repo_name,'target_path':repo_path}])
 
             print "Syncing repository to retrieve project."
             os.system('repo sync %s' % repo_path)
@@ -194,4 +208,4 @@ else:
             print "Done"
             sys.exit()
 
-print "Repository for %s not found in the SlimRoms Github repository list. If this is in error, you may need to manually add it to .repo/local_manifests/aocp_manifest.xml" % device
+print "Repository for %s not found in the TheCollective Github repository list. If this is in error, you may need to manually add it to your local_manifest.xml." % device
