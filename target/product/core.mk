@@ -27,6 +27,8 @@ PRODUCT_PACKAGES += \
     DefaultContainerService \
     Home \
     KeyChain \
+    MediaProvider \
+    PackageInstaller \
     PicoTts \
     SharedStorageBackup \
     TelephonyProvider \
