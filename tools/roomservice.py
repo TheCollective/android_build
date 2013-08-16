@@ -133,12 +133,16 @@ def add_to_manifest(repositories):
         repo_name = repository['repository']
         repo_target = repository['target_path']
         if exists_in_tree(lm, repo_name):
-            print 'TheCollective/%s already exists' % (repo_name)
+            print '%s already exists' % (repo_name)
             continue
 
-        print 'Adding dependency: TheCollective/%s -> %s' % (repo_name, repo_target)
+        print 'Adding dependency: %s -> %s' % (repo_name, repo_target)
         project = ElementTree.Element("project", attrib = { "path": repo_target,
             "revision": "jellybean3", "remote": "github", "name": "TheCollective/%s" % repo_name })
+
+        if 'remote' in repository:
+            project.set('remote',repository['remote'])
+            project.set('name',repo_name)
 
         if 'branch' in repository:
             project.set('revision',repository['branch'])
