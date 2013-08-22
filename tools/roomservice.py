@@ -60,6 +60,9 @@ while not depsonly:
         repositories.append(res)
     page = page + 1
 
+local_manifests = r'.repo/local_manifests'
+if not os.path.exists(local_manifests): os.makedirs(local_manifests)
+
 def exists_in_tree(lm, repository):
     for child in lm.getchildren():
         if child.attrib['name'].endswith(repository):
@@ -84,7 +87,7 @@ def indent(elem, level=0):
 
 def get_from_manifest(devicename):
     try:
-        lm = ElementTree.parse(".repo/local_manifest.xml")
+        lm = ElementTree.parse(".repo/local_manifests/aocp_manifest.xml")
         lm = lm.getroot()
     except:
         lm = ElementTree.Element("manifest")
@@ -108,7 +111,7 @@ def get_from_manifest(devicename):
 
 def is_in_manifest(projectname):
     try:
-        lm = ElementTree.parse(".repo/local_manifest.xml")
+        lm = ElementTree.parse(".repo/local_manifests/aocp_manifest.xml")
         lm = lm.getroot()
     except:
         lm = ElementTree.Element("manifest")
@@ -121,7 +124,7 @@ def is_in_manifest(projectname):
 
 def add_to_manifest(repositories):
     try:
-        lm = ElementTree.parse(".repo/local_manifest.xml")
+        lm = ElementTree.parse(".repo/local_manifests/aocp_manifest.xml")
         lm = lm.getroot()
     except:
         lm = ElementTree.Element("manifest")
@@ -130,12 +133,16 @@ def add_to_manifest(repositories):
         repo_name = repository['repository']
         repo_target = repository['target_path']
         if exists_in_tree(lm, repo_name):
-            print 'TheCollective/%s already exists' % (repo_name)
+            print '%s already exists' % (repo_name)
             continue
 
-        print 'Adding dependency: TheCollective/%s -> %s' % (repo_name, repo_target)
+        print 'Adding dependency: %s -> %s' % (repo_name, repo_target)
         project = ElementTree.Element("project", attrib = { "path": repo_target,
             "revision": "jellybean2", "remote": "github", "name": "TheCollective/%s" % repo_name })
+
+        if 'remote' in repository:
+            project.set('remote',repository['remote'])
+            project.set('name',repo_name)
 
         if 'branch' in repository:
             project.set('revision',repository['branch'])
@@ -146,7 +153,7 @@ def add_to_manifest(repositories):
     raw_xml = ElementTree.tostring(lm)
     raw_xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + raw_xml
 
-    f = open('.repo/local_manifest.xml', 'w')
+    f = open('.repo/local_manifests/aocp_manifest.xml', 'w')
     f.write(raw_xml)
     f.close()
 
