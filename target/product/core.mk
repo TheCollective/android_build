@@ -34,7 +34,6 @@ PRODUCT_PACKAGES += \
     TelephonyProvider \
     UserDictionaryProvider \
     VpnDialogs \
-    abcc \
     atrace \
     libandroidfw \
     libaudiopreprocessing \
