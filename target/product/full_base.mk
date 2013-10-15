@@ -39,7 +39,6 @@ PRODUCT_PACKAGES += \
     LiveWallpapersPicker \
     MagicSmokeWallpapers \
     NoiseField \
-    PhaseBeam \
     VisualizationWallpapers \
     PhotoTable
 
