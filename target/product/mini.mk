@@ -207,7 +207,7 @@ PRODUCT_PACKAGES += \
 # Additional settings used in all AOSP builds
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.com.android.dateformat=MM-dd-yyyy \
-    ro.config.ringtone=Ring_Synth_04.ogg \
+    ro.config.ringtone=Kuma.ogg \
     ro.config.notification_sound=pixiedust.ogg
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
