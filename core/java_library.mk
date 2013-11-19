@@ -18,10 +18,9 @@ ifneq (true,$(LOCAL_IS_STATIC_JAVA_LIBRARY))
 ifneq (,$(LOCAL_RESOURCE_DIR))
 $(error $(LOCAL_PATH): Target java libraries may not set LOCAL_RESOURCE_DIR)
 endif
-endif
-
-#xxx base_rules.mk looks at this
+# base_rules.mk looks at this
 all_res_assets :=
+endif
 
 LOCAL_BUILT_MODULE_STEM := javalib.jar
 
@@ -41,7 +40,7 @@ else
 ifeq (,$(TARGET_BUILD_APPS))
 ifeq (,$(LOCAL_APK_LIBRARIES))
 ifndef LOCAL_DEX_PREOPT
-LOCAL_DEX_PREOPT := true
+LOCAL_DEX_PREOPT := $(DEX_PREOPT_DEFAULT)
 endif
 endif
 endif
@@ -85,7 +84,7 @@ else # !LOCAL_IS_STATIC_JAVA_LIBRARY
 
 $(common_javalib.jar): PRIVATE_DEX_FILE := $(built_dex)
 $(common_javalib.jar) : $(built_dex) $(java_resource_sources)
-	@echo -e ${CL_GRN}"target Jar:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+	@echo -e ${CL_BLU}"target Jar:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
 	$(create-empty-package)
 	$(add-dex-to-package)
 	$(add-carried-java-resources)

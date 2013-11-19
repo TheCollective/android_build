@@ -131,10 +131,7 @@ LOCAL_BUILT_MODULE_STEM := package.apk
 LOCAL_PROGUARD_ENABLED:=$(strip $(LOCAL_PROGUARD_ENABLED))
 ifndef LOCAL_PROGUARD_ENABLED
 ifneq ($(DISABLE_PROGUARD),true)
-ifneq ($(filter user userdebug, $(TARGET_BUILD_VARIANT)),)
-    # turn on Proguard by default for user & userdebug build
     LOCAL_PROGUARD_ENABLED :=full
-endif
 endif
 endif
 ifeq ($(LOCAL_PROGUARD_ENABLED),disabled)
@@ -156,7 +153,7 @@ ifeq (,$(TARGET_BUILD_APPS))
 ifeq (,$(LOCAL_APK_LIBRARIES))
 ifneq (,$(LOCAL_SRC_FILES))
 ifndef LOCAL_DEX_PREOPT
-LOCAL_DEX_PREOPT := true
+LOCAL_DEX_PREOPT := $(DEX_PREOPT_DEFAULT)
 endif
 endif
 endif
@@ -411,7 +408,7 @@ else
     $(LOCAL_BUILT_MODULE): PRIVATE_PRODUCT_AAPT_PREF_CONFIG := $(PRODUCT_AAPT_PREF_CONFIG)
 endif
 $(LOCAL_BUILT_MODULE): $(all_res_assets) $(jni_shared_libraries) $(full_android_manifest)
-	@echo -e ${CL_GRN}"target Package:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+	@echo -e ${CL_BLU}"target Package:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
 	$(create-empty-package)
 	$(add-assets-to-package)
 ifneq ($(jni_shared_libraries),)
@@ -483,3 +480,6 @@ lint-$(LOCAL_PACKAGE_NAME) :
 lintall : lint-$(LOCAL_PACKAGE_NAME)
 
 endif # skip_definition
+
+# Reset internal variables.
+all_res_assets :=

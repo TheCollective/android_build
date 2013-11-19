@@ -26,12 +26,17 @@ endif
 # TODO: This duplicates logic from base_rules.mk because we need to
 #       know its results before base_rules.mk is included.
 #       Consolidate the duplicates.
-LOCAL_MODULE_STEM := $(strip $(LOCAL_MODULE_STEM))
-ifeq ($(LOCAL_MODULE_STEM),)
+ifndef LOCAL_MODULE_STEM
   LOCAL_MODULE_STEM := $(LOCAL_MODULE)
 endif
-LOCAL_INSTALLED_MODULE_STEM := $(LOCAL_MODULE_STEM)$(LOCAL_MODULE_SUFFIX)
-LOCAL_BUILT_MODULE_STEM := $(LOCAL_INSTALLED_MODULE_STEM)
+
+ifndef LOCAL_BUILT_MODULE_STEM
+  LOCAL_BUILT_MODULE_STEM := $(LOCAL_MODULE_STEM)$(LOCAL_MODULE_SUFFIX)
+endif
+
+ifndef LOCAL_INSTALLED_MODULE_STEM
+  LOCAL_INSTALLED_MODULE_STEM := $(LOCAL_MODULE_STEM)$(LOCAL_MODULE_SUFFIX)
+endif
 
 # base_rules.make defines $(intermediates), but we need its value
 # before we include base_rules.  Make a guess, and verify that
@@ -90,9 +95,9 @@ endif
 ## Store a copy with symbols for symbolic debugging
 ###########################################################
 symbolic_input := $(compress_output)
-symbolic_output := $(LOCAL_UNSTRIPPED_PATH)/$(LOCAL_BUILT_MODULE_STEM)
+symbolic_output := $(LOCAL_UNSTRIPPED_PATH)/$(LOCAL_INSTALLED_MODULE_STEM)
 $(symbolic_output) : $(symbolic_input) | $(ACP)
-	@echo -e ${CL_GRN}"target Symbolic:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+	@echo -e ${CL_BLU}"target Symbolic:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
 	$(copy-file-to-target)
 
 
@@ -122,7 +127,7 @@ $(strip_output): $(strip_input) | $(ACP)
 	$(copy-file-to-target)
 else
 $(strip_output): $(strip_input)
-	@echo -e ${CL_GRN}"target Unstripped:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+	@echo -e ${CL_BLU}"target Unstripped:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
 	$(copy-file-to-target-with-cp)
 endif
 endif # LOCAL_STRIP_MODULE
