@@ -25,7 +25,7 @@ PRODUCT_PACKAGES := \
 	FusedLocation \
 	Gallery \
 	Keyguard \
-	Music \
+	Apollo \
 	Mms \
 	OpenWnn \
 	PrintSpooler \
