@@ -33,13 +33,12 @@ PRODUCT_PACKAGES := \
     InputDevices \
     Keyguard \
     LatinIME \
-    Launcher2 \
+    Launcher3 \
     Music \
     MusicFX \
     OneTimeInitializer \
     PrintSpooler \
     Provision \
-    QuickSearchBox \
     Settings \
     SystemUI \
     TeleService \
