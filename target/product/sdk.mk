@@ -37,7 +37,7 @@ PRODUCT_PACKAGES := \
 	libjni_pinyinime \
 	SoftKeyboard \
 	SystemUI \
-	Launcher2 \
+	Aspire \
 	Development \
 	DevelopmentSettings \
 	Fallback \
